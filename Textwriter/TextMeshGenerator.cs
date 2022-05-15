@@ -9,11 +9,11 @@ public class TextMeshGenerator
         this.font = font;
     }
 
-    public TextVertex[] GenerateVertices(string text)
+    public TextVertex[] GenerateVertices(StyledText styledText)
     {
         List<TextVertex> vertices = new List<TextVertex>();
         
-        GlyphInfo[] glyphInfos = font.ShapeText(text);
+        GlyphInfo[] glyphInfos = font.ShapeText(styledText.Text);
         
         int advanceX = 0;
         int advanceY = 0;
