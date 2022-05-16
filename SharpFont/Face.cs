@@ -599,7 +599,7 @@ namespace SharpFont
 		/// Gets a value indicating whether a face object contains horizontal metrics (this is true for all font
 		/// formats though).
 		/// </summary>
-		public bool HasHoriziontal
+		public bool HasHorizontal
 		{
 			get
 			{
