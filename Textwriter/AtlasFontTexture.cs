@@ -22,7 +22,7 @@ public class AtlasFontTexture
         // overflow check
         if (ptrX + texture.Width > Texture.Width)
         {
-            ptrY += maxY + 4;
+            ptrY += maxY + 2;
             maxY = 0;
             ptrX = 0;
         }
@@ -38,7 +38,7 @@ public class AtlasFontTexture
             Min = new Vector2(ptrX / (float)Texture.Width, ptrY / (float)Texture.Height),
             Max = new Vector2((ptrX + texture.Width) / (float)Texture.Width, (ptrY + texture.Height) / (float)Texture.Height)
         };
-        ptrX += texture.Width + 4;
+        ptrX += texture.Width + 2;
         maxY = Math.Max(maxY, texture.Height);
         return uvInfo;
     }

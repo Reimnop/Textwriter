@@ -31,10 +31,10 @@ public static class TextMeshGenerator
 
                 if (glyph.Width * glyph.Height > 0)
                 {
-                    float minX = (advanceX + glyph.HorizontalBearingX + glyphInfo.OffsetX) / (float) font.Size;
-                    float minY = (advanceY + glyph.HorizontalBearingY - glyph.Height + glyphInfo.OffsetY) / (float) font.Size;
-                    float maxX = (advanceX + glyph.HorizontalBearingX + glyph.Width + glyphInfo.OffsetX) / (float) font.Size;
-                    float maxY = (advanceY + glyph.HorizontalBearingY + glyphInfo.OffsetY) / (float) font.Size;
+                    float minX = (advanceX + glyph.HorizontalBearingX + glyphInfo.OffsetX) / 64.0f;
+                    float minY = (advanceY + glyph.HorizontalBearingY - glyph.Height + glyphInfo.OffsetY) / 64.0f;
+                    float maxX = (advanceX + glyph.HorizontalBearingX + glyph.Width + glyphInfo.OffsetX) / 64.0f;
+                    float maxY = (advanceY + glyph.HorizontalBearingY + glyphInfo.OffsetY) / 64.0f;
                     float minU = glyph.Uv.Min.X;
                     float minV = glyph.Uv.Min.Y;
                     float maxU = glyph.Uv.Max.X;
