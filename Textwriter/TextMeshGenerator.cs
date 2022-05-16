@@ -1,44 +1,62 @@
-﻿namespace Textwriter;
+﻿using System.Drawing;
 
-public class TextMeshGenerator
+namespace Textwriter;
+
+public static class TextMeshGenerator
 {
-    private readonly Font font;
-
-    public TextMeshGenerator(Font font)
+    public static TextVertex[] GenerateVertices(FormattedText formattedText)
     {
-        this.font = font;
-    }
-
-    public TextVertex[] GenerateVertices(StyledText styledText)
-    {
+        Font font = formattedText.Font;
+        
         List<TextVertex> vertices = new List<TextVertex>();
-        
-        GlyphInfo[] glyphInfos = font.ShapeText(styledText.Text);
-        
+
         int advanceX = 0;
         int advanceY = 0;
-        foreach (GlyphInfo glyphInfo in glyphInfos)
+        foreach (RawText text in formattedText)
         {
-            Glyph glyph = font.GetGlyph(glyphInfo.Index);
+            if (text.Break)
+            {
+                advanceX = 0;
+                advanceY = 0;
+            }
+            
+            GlyphInfo[] glyphInfos = font.ShapeText(text.Text);
 
-            float minX = (advanceX + glyphInfo.OffsetX) / (float) font.Size;
-            float minY = (advanceY + glyphInfo.OffsetY) / (float) font.Size;
-            float maxX = (advanceX + glyph.HorizontalBearingX + glyphInfo.OffsetX) / (float) font.Size;
-            float maxY = (advanceY + glyph.Height - glyph.VerticalBearingY + glyphInfo.OffsetY) / (float) font.Size;
-            float minU = glyph.Uv.Min.X;
-            float minV = glyph.Uv.Min.Y;
-            float maxU = glyph.Uv.Max.X;
-            float maxV = glyph.Uv.Max.Y;
+            Style style = text.Style;
+            Color color = style.Color;
             
-            vertices.Add(new TextVertex(minX, minY, minU, maxV, 1.0f, 1.0f, 1.0f, 1.0f));
-            vertices.Add(new TextVertex(maxX, maxY, maxU, minV, 1.0f, 1.0f, 1.0f, 1.0f));
-            vertices.Add(new TextVertex(minX, maxY, minU, minV, 1.0f, 1.0f, 1.0f, 1.0f));
-            vertices.Add(new TextVertex(minX, minY, minU, maxV, 1.0f, 1.0f, 1.0f, 1.0f));
-            vertices.Add(new TextVertex(maxX, minY, maxU, maxV, 1.0f, 1.0f, 1.0f, 1.0f));
-            vertices.Add(new TextVertex(maxX, maxY, maxU, minV, 1.0f, 1.0f, 1.0f, 1.0f));
-            
-            advanceX += glyphInfo.AdvanceX;
-            advanceY += glyphInfo.AdvanceY;
+            foreach (GlyphInfo glyphInfo in glyphInfos)
+            {
+                Glyph glyph = font.GetGlyph(glyphInfo.Index);
+
+                if (glyph.Width * glyph.Height > 0)
+                {
+                    float minX = (advanceX + glyph.HorizontalBearingX + glyphInfo.OffsetX) / (float) font.Size;
+                    float minY = (advanceY + glyph.HorizontalBearingY - glyph.Height + glyphInfo.OffsetY) / (float) font.Size;
+                    float maxX = (advanceX + glyph.HorizontalBearingX + glyph.Width + glyphInfo.OffsetX) / (float) font.Size;
+                    float maxY = (advanceY + glyph.HorizontalBearingY + glyphInfo.OffsetY) / (float) font.Size;
+                    float minU = glyph.Uv.Min.X;
+                    float minV = glyph.Uv.Min.Y;
+                    float maxU = glyph.Uv.Max.X;
+                    float maxV = glyph.Uv.Max.Y;
+
+                    vertices.Add(new TextVertex(minX, minY, minU, maxV, 
+                        color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                    vertices.Add(new TextVertex(maxX, maxY, maxU, minV, 
+                        color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                    vertices.Add(new TextVertex(minX, maxY, minU, minV, 
+                        color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                    vertices.Add(new TextVertex(minX, minY, minU, maxV, 
+                        color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                    vertices.Add(new TextVertex(maxX, minY, maxU, maxV, 
+                        color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                    vertices.Add(new TextVertex(maxX, maxY, maxU, minV, 
+                        color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                }
+
+                advanceX += glyphInfo.AdvanceX;
+                advanceY += glyphInfo.AdvanceY;
+            }
         }
 
         return vertices.ToArray();

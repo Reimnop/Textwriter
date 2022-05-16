@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Net.Mime;
 using System.Numerics;
 
 namespace Textwriter;
@@ -7,7 +8,9 @@ public class AtlasFontTexture
 {
     public ClientFontTexture Texture { get; }
 
-    private readonly List<Rectangle> previouslyAddedGlyphs = new List<Rectangle>();
+    private int ptrX = 0;
+    private int ptrY = 0;
+    private int maxY = 0;
 
     public AtlasFontTexture(int width, int height)
     {
@@ -16,43 +19,27 @@ public class AtlasFontTexture
 
     public UvInfo AddGlyphTexture(ClientFontTexture texture)
     {
-        for (int y = 0; y < Texture.Height; y++)
+        // overflow check
+        if (ptrX + texture.Width > Texture.Width)
         {
-            for (int x = 0; x < Texture.Width; x++)
-            {
-                Rectangle glyphRect = new Rectangle(x, y, texture.Width, texture.Height);
-                if (CanTextureFit(glyphRect))
-                {
-                    Texture.WritePartial(texture, x, y);
-                    UvInfo uvInfo = new UvInfo
-                    {
-                        Min = new Vector2(x / (float)Texture.Width, y / (float)Texture.Height),
-                        Max = new Vector2((x + texture.Width) / (float)Texture.Width, (y + texture.Height) / (float)Texture.Height)
-                    };
-                    return uvInfo;
-                }
-            }
+            ptrY += maxY + 4;
+            maxY = 0;
+            ptrX = 0;
         }
 
-        throw new Exception("Could not fit texture onto atlas!");
-    }
-
-    private bool CanTextureFit(Rectangle rect)
-    {
-        Rectangle globalRect = new Rectangle(0, 0, Texture.Width, Texture.Height);
-        if (!globalRect.Contains(rect))
+        if (ptrY + texture.Height > Texture.Height)
         {
-            return false;
+            throw new Exception("Could not fit texture onto atlas!");
         }
         
-        foreach (Rectangle rectangle in previouslyAddedGlyphs)
+        Texture.WritePartial(texture, ptrX, ptrY);
+        UvInfo uvInfo = new UvInfo
         {
-            if (rect.IntersectsWith(rectangle))
-            {
-                return false;
-            }
-        }
-
-        return true;
+            Min = new Vector2(ptrX / (float)Texture.Width, ptrY / (float)Texture.Height),
+            Max = new Vector2((ptrX + texture.Width) / (float)Texture.Width, (ptrY + texture.Height) / (float)Texture.Height)
+        };
+        ptrX += texture.Width + 4;
+        maxY = Math.Max(maxY, texture.Height);
+        return uvInfo;
     }
 }

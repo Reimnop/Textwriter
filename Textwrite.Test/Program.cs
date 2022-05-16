@@ -1,17 +1,18 @@
-﻿using System.Drawing;
-using SharpFont;
-using Textwriter;
+﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using Textwrite.Test;
 
-using Library lib = new Library();
-using Font font = new Font(lib, "Montserrat.ttf", 48, 512, 512);
-TextMeshGenerator textMeshGenerator = new TextMeshGenerator(font);
+GameWindowSettings gws = GameWindowSettings.Default;
+NativeWindowSettings nws = new NativeWindowSettings
+{
+    APIVersion = new Version(4, 3),
+    Profile = ContextProfile.Core,
+    Size = new Vector2i(1600, 900),
+    Flags = ContextFlags.ForwardCompatible
+};
 
-StyledText styledText = new StyledText("Hello world!")
-    .WithBold(true)
-    .WithStrikethrough(true)
-    .WithUnderline(true)
-    .WithColor(Color.Green);
-
-TextVertex[] vertices = textMeshGenerator.GenerateVertices(styledText);
-// upload vertices to GPU then render...
-
+using (MainWindow mw = new MainWindow(gws, nws))
+{
+    mw.Run();
+}
