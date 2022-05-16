@@ -13,13 +13,14 @@ public class MainWindow : GameWindow
 {
     private int program;
     private int vao, vbo;
-    private int[] textures = new int[3];
+    private int[] textures = new int[4];
     private int vertCount;
 
     private Library freetype;
     private Font fontRegular;
     private Font fontBold;
     private Font fontItalic;
+    private Font fontAlternative;
     
     public MainWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -66,27 +67,48 @@ public class MainWindow : GameWindow
         GL.DetachShader(program, frag);
         GL.DeleteShader(vert);
         GL.DeleteShader(frag);
-        
-        var text = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in nunc vitae
-ex pharetra condimentum id in magna. Duis lacinia ullamcorper tellus, pulvinar
-fermentum ipsum efficitur sed. Proin bibendum augue ut urna finibus viverra. Integer
-eleifend erat eget neque tincidunt aliquam. Pellentesque at nisi cursus, tristique
-tellus in, lobortis mi. Curabitur vel enim dolor. Maecenas quis turpis a nisi luctus
-consequat ac sit amet neque. Cras ac justo diam. Donec nulla nisi, mollis vitae felis
-consectetur, pharetra ornare odio. Donec sit amet sapien eget lacus facilisis faucibus.
-Phasellus rutrum sed ligula nec aliquam. Nullam vitae volutpat felis, sit amet tristique
-felis. Aliquam dictum sapien semper tortor elementum, congue convallis ligula
-ultricies. Vivamus imperdiet maximus urna.";
 
         freetype = new Library();
         fontRegular = new Font(freetype, "Roboto-Regular.ttf", 48, 2048, 2048);
         fontBold = new Font(freetype, "Roboto-Bold.ttf", 48, 2048, 2048);
         fontItalic = new Font(freetype, "Roboto-Italic.ttf", 48, 2048, 2048);
-        TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic)
+        fontAlternative = new Font(freetype, "PlayfairDisplay-Regular.ttf", 48, 2048, 2048);
+
+        TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic, fontAlternative)
             .WithBaselineOffset(-fontRegular.Size * 64)
-            .AddText(new StyledText(text, fontRegular)
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontRegular)
+                .WithColor(Color.White))
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontBold)
+                .WithColor(Color.Aqua))
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontItalic)
+                .WithColor(Color.Gold))
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontRegular)
+                .WithColor(Color.Red)
+                .WithUnderline(true))
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontItalic)
+                .WithColor(Color.LawnGreen)
+                .WithStrikethrough(true))
+            .AddText(new StyledText("Changing style", fontItalic)
+                .WithColor(Color.White)
+                .WithStrikethrough(true))
+            .AddText(new StyledText(" ", fontRegular))
+            .AddText(new StyledText("in the middle of", fontRegular)
+                .WithColor(Color.Magenta)
+                .WithUnderline(true))
+            .AddText(new StyledText(" text is also supported! ", fontBold)
+                .WithColor(Color.Wheat))
+            .AddText(new StyledText("(even font)\n", fontAlternative)
+                .WithColor(Color.White))
+            .AddText(new StyledText("Also supports ", fontRegular)
+                .WithColor(Color.White))
+            .AddText(new StyledText("(это русский)", fontAlternative)
+                .WithColor(Color.Yellow))
+            .AddText(new StyledText(" multiple languages!\n", fontRegular)
+                .WithColor(Color.White))
+            .AddText(new StyledText("All drawn within a single drawcall!", fontRegular)
                 .WithColor(Color.White)
                 .WithUnderline(true));
+        
         TextVertex[] vertices = TextMeshGenerator.GenerateVertices(textBuilder.Build());
         vertCount = vertices.Length;
 
@@ -117,7 +139,7 @@ ultricies. Vivamus imperdiet maximus urna.";
         GL.VertexArrayAttribIFormat(vao, 3, 1, VertexAttribType.Int, 0);
         GL.VertexArrayAttribBinding(vao, 3, 3);
         
-        GL.CreateTextures(TextureTarget.Texture2D, 3, out textures[0]);
+        GL.CreateTextures(TextureTarget.Texture2D, 4, out textures[0]);
         
         GL.TextureStorage2D(textures[0], 1, SizedInternalFormat.R8, fontRegular.Atlas.Texture.Width, fontRegular.Atlas.Texture.Height);
         GL.TextureSubImage2D(textures[0], 0, 0, 0, fontRegular.Atlas.Texture.Width, fontRegular.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontRegular.Atlas.Texture.Pixels);
@@ -127,6 +149,9 @@ ultricies. Vivamus imperdiet maximus urna.";
         
         GL.TextureStorage2D(textures[2], 1, SizedInternalFormat.R8, fontItalic.Atlas.Texture.Width, fontItalic.Atlas.Texture.Height);
         GL.TextureSubImage2D(textures[2], 0, 0, 0, fontItalic.Atlas.Texture.Width, fontItalic.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontItalic.Atlas.Texture.Pixels);
+        
+        GL.TextureStorage2D(textures[3], 1, SizedInternalFormat.R8, fontAlternative.Atlas.Texture.Width, fontAlternative.Atlas.Texture.Height);
+        GL.TextureSubImage2D(textures[3], 0, 0, 0, fontAlternative.Atlas.Texture.Width, fontAlternative.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontAlternative.Atlas.Texture.Pixels);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -146,9 +171,11 @@ ultricies. Vivamus imperdiet maximus urna.";
         GL.Uniform1(1, 0);
         GL.Uniform1(2, 1);
         GL.Uniform1(3, 2);
+        GL.Uniform1(4, 3);
         GL.BindTextureUnit(0, textures[0]);
         GL.BindTextureUnit(1, textures[1]);
         GL.BindTextureUnit(2, textures[2]);
+        GL.BindTextureUnit(3, textures[3]);
         GL.BindVertexArray(vao);
         GL.DrawArrays(PrimitiveType.Triangles, 0, vertCount);
         
