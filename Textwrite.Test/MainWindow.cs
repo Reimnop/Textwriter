@@ -68,9 +68,9 @@ public class MainWindow : GameWindow
         GL.DeleteShader(frag);
 
         freetype = new Library();
-        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 64, 3076, 3076);
-        fontBold = new Font(freetype, "Roboto-Bold.ttf", 64, 3076, 3076);
-        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 64, 3076, 3076);
+        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 64, 2048, 2048);
+        fontBold = new Font(freetype, "Roboto-Bold.ttf", 64, 2048, 2048);
+        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 64, 2048, 2048);
         TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic)
             .AddText(new StyledText("The quick brown fox\n", fontRegular).WithColor(Color.White))
             .AddText(new StyledText("jumps over the\nlazy ", fontRegular).WithColor(Color.DeepSkyBlue))
