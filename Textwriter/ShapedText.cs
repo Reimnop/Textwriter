@@ -1,10 +1,8 @@
-﻿using System.Numerics;
+﻿namespace Textwriter;
 
-namespace Textwriter;
-
-public class RawText
+public class ShapedText
 {
-    public string Text { get; set; }
+    public GlyphInfo[] Glyphs { get; set; }
     public Style Style { get; set; }
     public Font Font { get; set; }
     public int TextureIndex { get; set; }

@@ -13,9 +13,15 @@ namespace Textwriter;
 public class Font : IDisposable
 {
     public int Size { get; }
-    public AtlasFontTexture Atlas { get; }
+    public short Ascender { get; }
+    public short Descender { get; }
     public short UnderlinePosition { get; }
     public short UnderlineThickness { get; }
+    public short StrikethroughPosition { get; }
+    public short StrikethroughThickness { get; }
+
+    public AtlasFontTexture Atlas { get; }
+    
 
     private readonly FtFace ftFace;
     private readonly HbFont hbFont;
@@ -28,9 +34,15 @@ public class Font : IDisposable
         
         ftFace = new FtFace(library, path);
         ftFace.SetPixelSizes(0, (uint)size);
-
+        
+        Ascender = ftFace.Ascender;
+        Descender = ftFace.Descender;
         UnderlinePosition = ftFace.UnderlinePosition;
         UnderlineThickness = ftFace.UnderlineThickness;
+        
+        // TODO: Fetch from font
+        StrikethroughPosition = (short)(ftFace.Ascender / 2);
+        StrikethroughThickness = ftFace.UnderlineThickness;
 
         Atlas = new AtlasFontTexture(atlasWidth, atlasHeight);
         glyphs = new Glyph[ftFace.GlyphCount];

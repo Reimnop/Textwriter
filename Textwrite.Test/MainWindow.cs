@@ -66,16 +66,27 @@ public class MainWindow : GameWindow
         GL.DetachShader(program, frag);
         GL.DeleteShader(vert);
         GL.DeleteShader(frag);
+        
+        var text = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in nunc vitae
+ex pharetra condimentum id in magna. Duis lacinia ullamcorper tellus, pulvinar
+fermentum ipsum efficitur sed. Proin bibendum augue ut urna finibus viverra. Integer
+eleifend erat eget neque tincidunt aliquam. Pellentesque at nisi cursus, tristique
+tellus in, lobortis mi. Curabitur vel enim dolor. Maecenas quis turpis a nisi luctus
+consequat ac sit amet neque. Cras ac justo diam. Donec nulla nisi, mollis vitae felis
+consectetur, pharetra ornare odio. Donec sit amet sapien eget lacus facilisis faucibus.
+Phasellus rutrum sed ligula nec aliquam. Nullam vitae volutpat felis, sit amet tristique
+felis. Aliquam dictum sapien semper tortor elementum, congue convallis ligula
+ultricies. Vivamus imperdiet maximus urna.";
 
         freetype = new Library();
-        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 64, 2048, 2048);
-        fontBold = new Font(freetype, "Roboto-Bold.ttf", 64, 2048, 2048);
-        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 64, 2048, 2048);
+        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 48, 2048, 2048);
+        fontBold = new Font(freetype, "Roboto-Bold.ttf", 48, 2048, 2048);
+        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 48, 2048, 2048);
         TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic)
-            .AddText(new StyledText("The quick brown fox\n", fontRegular).WithColor(Color.White))
-            .AddText(new StyledText("jumps over the\nlazy ", fontRegular).WithColor(Color.DeepSkyBlue))
-            .AddText(new StyledText("dog.\n", fontBold).WithColor(Color.DeepSkyBlue))
-            .AddText(new StyledText("0123456789", fontItalic).WithColor(Color.Gold));
+            .WithBaselineOffset(-fontRegular.Size * 64)
+            .AddText(new StyledText(text, fontRegular)
+                .WithColor(Color.White)
+                .WithUnderline(true));
         TextVertex[] vertices = TextMeshGenerator.GenerateVertices(textBuilder.Build());
         vertCount = vertices.Length;
 
@@ -128,7 +139,7 @@ public class MainWindow : GameWindow
         GL.Enable(EnableCap.Blend);
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         
-        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(-8, Size.X, -Size.Y, 64.0f, -8.0f, 8.0f);
+        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(0.0f, Size.X, -Size.Y, 0.0f, -8.0f, 8.0f);
         
         GL.UseProgram(program);
         GL.UniformMatrix4(0, true, ref projection);

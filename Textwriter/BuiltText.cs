@@ -2,11 +2,11 @@
 
 namespace Textwriter;
 
-public class FormattedText : IEnumerable
+public class BuiltText : IEnumerable
 {
-    public RawText[] Texts { get; }
+    public ShapedText[] Texts { get; }
 
-    public FormattedText(ICollection<RawText> texts)
+    public BuiltText(IEnumerable<ShapedText> texts)
     {
         Texts = texts.ToArray();
     }
