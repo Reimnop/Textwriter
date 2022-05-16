@@ -4,13 +4,11 @@ namespace Textwriter;
 
 public class FormattedText : IEnumerable
 {
-    public readonly RawText[] Texts;
-    public readonly Font Font;
+    public RawText[] Texts { get; }
 
-    public FormattedText(ICollection<RawText> texts, Font font)
+    public FormattedText(ICollection<RawText> texts)
     {
         Texts = texts.ToArray();
-        Font = font;
     }
     
     public IEnumerator GetEnumerator()

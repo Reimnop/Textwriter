@@ -13,11 +13,13 @@ public class MainWindow : GameWindow
 {
     private int program;
     private int vao, vbo;
-    private int texture;
+    private int[] textures = new int[3];
     private int vertCount;
 
     private Library freetype;
-    private Font font;
+    private Font fontRegular;
+    private Font fontBold;
+    private Font fontItalic;
     
     public MainWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -30,15 +32,35 @@ public class MainWindow : GameWindow
         int vert = GL.CreateShader(ShaderType.VertexShader);
         GL.ShaderSource(vert, File.ReadAllText("shader.vert"));
         GL.CompileShader(vert);
+        
+        GL.GetShader(vert, ShaderParameter.CompileStatus, out int vertCode);
+        if (vertCode != (int)All.True)
+        {
+            string infoLog = GL.GetShaderInfoLog(vert);
+            throw new Exception($"Error occurred whilst compiling Shader({vert}).\n\n{infoLog}");
+        }
 
         int frag = GL.CreateShader(ShaderType.FragmentShader);
         GL.ShaderSource(frag, File.ReadAllText("shader.frag"));
         GL.CompileShader(frag);
+        
+        GL.GetShader(frag, ShaderParameter.CompileStatus, out int fragCode);
+        if (fragCode != (int)All.True)
+        {
+            string infoLog = GL.GetShaderInfoLog(frag);
+            throw new Exception($"Error occurred whilst compiling Shader({frag}).\n\n{infoLog}");
+        }
 
         program = GL.CreateProgram();
         GL.AttachShader(program, vert);
         GL.AttachShader(program, frag);
         GL.LinkProgram(program);
+        
+        GL.GetProgram(program, GetProgramParameterName.LinkStatus, out int linkCode);
+        if (linkCode != (int)All.True)
+        {
+            throw new Exception($"Error occurred whilst linking Program({program})");
+        }
         
         GL.DetachShader(program, vert);
         GL.DetachShader(program, frag);
@@ -46,11 +68,14 @@ public class MainWindow : GameWindow
         GL.DeleteShader(frag);
 
         freetype = new Library();
-        font = new Font(freetype, "Montserrat.ttf", 64, 3076, 3076);
-        TextBuilder textBuilder = new TextBuilder(font)
-            .AddText(new StyledText("Hello ").WithColor(Color.White))
-            .AddText(new StyledText("world").WithColor(Color.Lime))
-            .AddText(new StyledText("!").WithColor(Color.Red));
+        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 64, 3076, 3076);
+        fontBold = new Font(freetype, "Roboto-Bold.ttf", 64, 3076, 3076);
+        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 64, 3076, 3076);
+        TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic)
+            .AddText(new StyledText("The quick brown fox\n", fontRegular).WithColor(Color.White))
+            .AddText(new StyledText("jumps over the\nlazy ", fontRegular).WithColor(Color.DeepSkyBlue))
+            .AddText(new StyledText("dog.\n", fontBold).WithColor(Color.DeepSkyBlue))
+            .AddText(new StyledText("0123456789", fontItalic).WithColor(Color.Gold));
         TextVertex[] vertices = TextMeshGenerator.GenerateVertices(textBuilder.Build());
         vertCount = vertices.Length;
 
@@ -76,9 +101,21 @@ public class MainWindow : GameWindow
         GL.VertexArrayAttribFormat(vao, 2, 4, VertexAttribType.Float, false, 0);
         GL.VertexArrayAttribBinding(vao, 2, 2);
         
-        GL.CreateTextures(TextureTarget.Texture2D, 1, out texture);
-        GL.TextureStorage2D(texture, 1, SizedInternalFormat.R8, font.Atlas.Texture.Width, font.Atlas.Texture.Height);
-        GL.TextureSubImage2D(texture, 0, 0, 0, font.Atlas.Texture.Width, font.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, font.Atlas.Texture.Pixels);
+        GL.EnableVertexArrayAttrib(vao, 3);
+        GL.VertexArrayVertexBuffer(vao, 3, vbo, new IntPtr(sizeof(float) * 8), stride);
+        GL.VertexArrayAttribIFormat(vao, 3, 1, VertexAttribType.Int, 0);
+        GL.VertexArrayAttribBinding(vao, 3, 3);
+        
+        GL.CreateTextures(TextureTarget.Texture2D, 3, out textures[0]);
+        
+        GL.TextureStorage2D(textures[0], 1, SizedInternalFormat.R8, fontRegular.Atlas.Texture.Width, fontRegular.Atlas.Texture.Height);
+        GL.TextureSubImage2D(textures[0], 0, 0, 0, fontRegular.Atlas.Texture.Width, fontRegular.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontRegular.Atlas.Texture.Pixels);
+        
+        GL.TextureStorage2D(textures[1], 1, SizedInternalFormat.R8, fontBold.Atlas.Texture.Width, fontBold.Atlas.Texture.Height);
+        GL.TextureSubImage2D(textures[1], 0, 0, 0, fontBold.Atlas.Texture.Width, fontBold.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontBold.Atlas.Texture.Pixels);
+        
+        GL.TextureStorage2D(textures[2], 1, SizedInternalFormat.R8, fontItalic.Atlas.Texture.Width, fontItalic.Atlas.Texture.Height);
+        GL.TextureSubImage2D(textures[2], 0, 0, 0, fontItalic.Atlas.Texture.Width, fontItalic.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontItalic.Atlas.Texture.Pixels);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
@@ -88,12 +125,19 @@ public class MainWindow : GameWindow
         GL.Viewport(0, 0, Size.X, Size.Y);
         GL.Clear(ClearBufferMask.ColorBufferBit);
         
-        Matrix4 projection = Matrix4.CreateOrthographic(Size.X, Size.Y, -8.0f, 8.0f);
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        
+        Matrix4 projection = Matrix4.CreateOrthographicOffCenter(-8, Size.X, -Size.Y, 64.0f, -8.0f, 8.0f);
         
         GL.UseProgram(program);
         GL.UniformMatrix4(0, true, ref projection);
         GL.Uniform1(1, 0);
-        GL.BindTextureUnit(0, texture);
+        GL.Uniform1(2, 1);
+        GL.Uniform1(3, 2);
+        GL.BindTextureUnit(0, textures[0]);
+        GL.BindTextureUnit(1, textures[1]);
+        GL.BindTextureUnit(2, textures[2]);
         GL.BindVertexArray(vao);
         GL.DrawArrays(PrimitiveType.Triangles, 0, vertCount);
         

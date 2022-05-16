@@ -14,6 +14,8 @@ public class Font : IDisposable
 {
     public int Size { get; }
     public AtlasFontTexture Atlas { get; }
+    public short UnderlinePosition { get; }
+    public short UnderlineThickness { get; }
 
     private readonly FtFace ftFace;
     private readonly HbFont hbFont;
@@ -26,6 +28,9 @@ public class Font : IDisposable
         
         ftFace = new FtFace(library, path);
         ftFace.SetPixelSizes(0, (uint)size);
+
+        UnderlinePosition = ftFace.UnderlinePosition;
+        UnderlineThickness = ftFace.UnderlineThickness;
 
         Atlas = new AtlasFontTexture(atlasWidth, atlasHeight);
         glyphs = new Glyph[ftFace.GlyphCount];

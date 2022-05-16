@@ -6,13 +6,15 @@ public class StyledText
 {
     public string Text { get; set; }
     public Style Style { get; set; }
+    public Font Font { get; set; }
 
-    public StyledText(string text)
+    public StyledText(string text, Font font)
     {
         Text = text;
+        Font = font;
     }
 
-    public StyledText(string text, Style style) : this(text)
+    public StyledText(string text, Style style, Font font) : this(text, font)
     {
         Style = style;
     }
@@ -23,20 +25,6 @@ public class StyledText
         return this;
     }
 
-    public StyledText WithBold(bool value)
-    {
-        Style style = Style;
-        style.Bold = value;
-        return WithStyle(style);
-    }
-    
-    public StyledText WithItalic(bool value)
-    {
-        Style style = Style;
-        style.Italic = value;
-        return WithStyle(style);
-    }
-    
     public StyledText WithStrikethrough(bool value)
     {
         Style style = Style;
