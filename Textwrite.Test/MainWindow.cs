@@ -69,10 +69,10 @@ public class MainWindow : GameWindow
         GL.DeleteShader(frag);
 
         freetype = new Library();
-        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 48, 2048, 2048);
-        fontBold = new Font(freetype, "Roboto-Bold.ttf", 48, 2048, 2048);
-        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 48, 2048, 2048);
-        fontAlternative = new Font(freetype, "PlayfairDisplay-Regular.ttf", 48, 2048, 2048);
+        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 48, 1536, 1536);
+        fontBold = new Font(freetype, "Roboto-Bold.ttf", 48, 1536, 1536);
+        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 48, 1536, 1536);
+        fontAlternative = new Font(freetype, "PlayfairDisplay-Regular.ttf", 48, 1536, 1536);
 
         TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic, fontAlternative)
             .WithBaselineOffset(-fontRegular.Size * 64)
