@@ -1,4 +1,6 @@
-﻿namespace Textwriter;
+﻿using System.Text.RegularExpressions;
+
+namespace Textwriter;
 
 public class TextBuilder
 {
@@ -94,7 +96,7 @@ public class TextBuilder
     private List<ShapedText> SplitStyledTextIntoShapedTextLines(StyledText text)
     {
         List<ShapedText> result = new List<ShapedText>();
-        string[] strs = text.Text.Split('\n');
+        string[] strs = Regex.Split(text.Text, "\n|\r\n");
         foreach (string str in strs)
         {
             ShapedText shapedText = new ShapedText();
