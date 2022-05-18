@@ -5,16 +5,27 @@ namespace Textwriter;
 public class TextBuilder
 {
     private readonly List<StyledText> styledTexts = new List<StyledText>();
-    private readonly Dictionary<Font, int> fonts = new Dictionary<Font, int>();
+    private readonly Dictionary<AtlasTexture, int> atlases = new Dictionary<AtlasTexture, int>();
     private int baselineOffset = 0;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left;
     private VerticalAlignment verticalAlignment = VerticalAlignment.Bottom;
 
     public TextBuilder(params Font[] fonts)
     {
+        int texIndex = 0;
         for (int i = 0; i < fonts.Length; i++)
         {
-            this.fonts.Add(fonts[i], i);
+            if (fonts[i].GrayscaleAtlas != null)
+            {
+                atlases.Add(fonts[i].GrayscaleAtlas, texIndex);
+                texIndex++;
+            }
+
+            if (fonts[i].ColoredAtlas != null)
+            {
+                atlases.Add(fonts[i].ColoredAtlas, texIndex);
+                texIndex++;
+            }
         }
     }
 
@@ -99,11 +110,28 @@ public class TextBuilder
         string[] strs = Regex.Split(text.Text, "\n|\r\n");
         foreach (string str in strs)
         {
+            GlyphInfo[] glyphs = text.Font.ShapeText(str);
+            BuiltGlyph[] builtGlyphs = new BuiltGlyph[glyphs.Length];
+
+            for (int i = 0; i < glyphs.Length; i++)
+            {
+                builtGlyphs[i] = new BuiltGlyph
+                {
+                    AdvanceX = glyphs[i].AdvanceX,
+                    AdvanceY = glyphs[i].AdvanceY,
+                    OffsetX = glyphs[i].OffsetX,
+                    OffsetY = glyphs[i].OffsetY,
+                    Index = glyphs[i].Index,
+                    TextureIndex = glyphs[i].Colored
+                        ? -(atlases[text.Font.ColoredAtlas] + 1)
+                        : atlases[text.Font.GrayscaleAtlas] + 1
+                };
+            }
+
             ShapedText shapedText = new ShapedText();
-            shapedText.Glyphs = text.Font.ShapeText(str);
+            shapedText.Glyphs = builtGlyphs;
             shapedText.Style = text.Style;
             shapedText.Font = text.Font;
-            shapedText.TextureIndex = fonts[text.Font];
             result.Add(shapedText);
         }
 
@@ -156,7 +184,7 @@ public class TextBuilder
         int result = 0;
         foreach (ShapedText shapedText in shapedTexts)
         {
-            result = Math.Max(result, shapedText.Font.Size * 64);
+            result = Math.Max(result, shapedText.Font.Height);
         }
 
         return result;
@@ -167,7 +195,7 @@ public class TextBuilder
         int result = 0;
         foreach (ShapedText shapedText in shapedTexts)
         {
-            foreach (GlyphInfo glyphInfo in shapedText.Glyphs)
+            foreach (BuiltGlyph glyphInfo in shapedText.Glyphs)
             {
                 Glyph glyph = shapedText.Font.GetGlyph(glyphInfo.Index);
                 result += glyph.AdvanceX;

@@ -19,8 +19,7 @@ public struct TextVertex
         TextureIndex = index;
     }
 
-    public TextVertex(float x, float y, float r, float g, float b, float a) : this(x, y, 0.0f, 0.0f, r, g, b, a, -1)
+    public TextVertex(float x, float y, float r, float g, float b, float a) : this(x, y, 0.0f, 0.0f, r, g, b, a, 0)
     {
     }
-
 }

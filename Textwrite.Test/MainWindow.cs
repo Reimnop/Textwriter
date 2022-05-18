@@ -13,14 +13,11 @@ public class MainWindow : GameWindow
 {
     private int program;
     private int vao, vbo;
-    private int[] textures = new int[4];
     private int vertCount;
 
     private Library freetype;
-    private Font fontRegular;
-    private Font fontBold;
-    private Font fontItalic;
-    private Font fontAlternative;
+    private List<Font> fonts = new List<Font>();
+    private List<int> textures = new List<int>();
     
     public MainWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -69,46 +66,55 @@ public class MainWindow : GameWindow
         GL.DeleteShader(frag);
 
         freetype = new Library();
-        fontRegular = new Font(freetype, "Roboto-Regular.ttf", 48, 1536, 1536);
-        fontBold = new Font(freetype, "Roboto-Bold.ttf", 48, 1536, 1536);
-        fontItalic = new Font(freetype, "Roboto-Italic.ttf", 48, 1536, 1536);
-        fontAlternative = new Font(freetype, "PlayfairDisplay-Regular.ttf", 48, 1536, 1536);
 
-        TextBuilder textBuilder = new TextBuilder(fontRegular, fontBold, fontItalic, fontAlternative)
-            .WithBaselineOffset(-fontRegular.Size * 64)
-            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontRegular)
+        fonts = new List<Font>()
+        {
+            new Font(freetype, "Roboto-Regular.ttf", 32, 2048),
+            new Font(freetype, "Roboto-Bold.ttf", 32, 2048),
+            new Font(freetype, "Roboto-Italic.ttf", 32, 2048),
+            new Font(freetype, "PlayfairDisplay-Regular.ttf", 32, 2048),
+            new Font(freetype, "C:\\Windows\\Fonts\\seguiemj.ttf", 32, 2048)
+        };
+
+        TextBuilder textBuilder = new TextBuilder(fonts.ToArray())
+            .WithBaselineOffset(-fonts[0].Height)
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fonts[0])
                 .WithColor(Color.White))
-            .AddText(new StyledText("Sphinx of black quartz, judge my vow. 0123456789\n", fontBold)
+            .AddText(new StyledText("Sphinx of black quartz, judge my vow. 0123456789\n", fonts[1])
                 .WithColor(Color.Aqua))
-            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontItalic)
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fonts[2])
                 .WithColor(Color.Gold))
-            .AddText(new StyledText("Sphinx of black quartz, judge my vow. 0123456789\n", fontRegular)
+            .AddText(new StyledText("Sphinx of black quartz, judge my vow. 0123456789\n", fonts[0])
                 .WithColor(Color.Red)
                 .WithUnderline(true))
-            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fontItalic)
+            .AddText(new StyledText("The quick brown fox jumps over the lazy dog. 0123456789\n", fonts[2])
                 .WithColor(Color.LawnGreen)
                 .WithStrikethrough(true))
-            .AddText(new StyledText("Changing style", fontItalic)
+            .AddText(new StyledText("Changing style", fonts[2])
                 .WithColor(Color.White)
                 .WithStrikethrough(true))
-            .AddText(new StyledText(" ", fontRegular))
-            .AddText(new StyledText("in the middle of", fontRegular)
+            .AddText(new StyledText(" ", fonts[0]))
+            .AddText(new StyledText("in the middle of", fonts[0])
                 .WithColor(Color.Magenta)
                 .WithUnderline(true))
-            .AddText(new StyledText(" text is also supported! ", fontBold)
+            .AddText(new StyledText(" text is also supported! ", fonts[1])
                 .WithColor(Color.Wheat))
-            .AddText(new StyledText("(even font)\n", fontAlternative)
+            .AddText(new StyledText("(even font)\n", fonts[3])
                 .WithColor(Color.White))
-            .AddText(new StyledText("Also supports ", fontRegular)
+            .AddText(new StyledText("Also supports ", fonts[0])
                 .WithColor(Color.White))
-            .AddText(new StyledText("(это русский)", fontAlternative)
+            .AddText(new StyledText("(это русский)", fonts[3])
                 .WithColor(Color.Yellow))
-            .AddText(new StyledText(" multiple languages!\n", fontRegular)
+            .AddText(new StyledText(" multiple languages!\n", fonts[0])
                 .WithColor(Color.White))
-            .AddText(new StyledText("All drawn within a single drawcall!", fontRegular)
+            .AddText(new StyledText("Emojis! ", fonts[0])
+                .WithColor(Color.White))
+            .AddText(new StyledText("💀🙂🤓🤯🎉🍾❤️✨😭😍💵\n", fonts[4])
+                .WithColor(Color.White))
+            .AddText(new StyledText("All drawn within a single drawcall!\n", fonts[0])
                 .WithColor(Color.White)
                 .WithUnderline(true));
-        
+
         TextVertex[] vertices = TextMeshGenerator.GenerateVertices(textBuilder.Build());
         vertCount = vertices.Length;
 
@@ -138,25 +144,34 @@ public class MainWindow : GameWindow
         GL.VertexArrayVertexBuffer(vao, 3, vbo, new IntPtr(sizeof(float) * 8), stride);
         GL.VertexArrayAttribIFormat(vao, 3, 1, VertexAttribType.Int, 0);
         GL.VertexArrayAttribBinding(vao, 3, 3);
-        
-        GL.CreateTextures(TextureTarget.Texture2D, 4, out textures[0]);
-        
-        GL.TextureStorage2D(textures[0], 1, SizedInternalFormat.R8, fontRegular.Atlas.Texture.Width, fontRegular.Atlas.Texture.Height);
-        GL.TextureSubImage2D(textures[0], 0, 0, 0, fontRegular.Atlas.Texture.Width, fontRegular.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontRegular.Atlas.Texture.Pixels);
-        
-        GL.TextureStorage2D(textures[1], 1, SizedInternalFormat.R8, fontBold.Atlas.Texture.Width, fontBold.Atlas.Texture.Height);
-        GL.TextureSubImage2D(textures[1], 0, 0, 0, fontBold.Atlas.Texture.Width, fontBold.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontBold.Atlas.Texture.Pixels);
-        
-        GL.TextureStorage2D(textures[2], 1, SizedInternalFormat.R8, fontItalic.Atlas.Texture.Width, fontItalic.Atlas.Texture.Height);
-        GL.TextureSubImage2D(textures[2], 0, 0, 0, fontItalic.Atlas.Texture.Width, fontItalic.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontItalic.Atlas.Texture.Pixels);
-        
-        GL.TextureStorage2D(textures[3], 1, SizedInternalFormat.R8, fontAlternative.Atlas.Texture.Width, fontAlternative.Atlas.Texture.Height);
-        GL.TextureSubImage2D(textures[3], 0, 0, 0, fontAlternative.Atlas.Texture.Width, fontAlternative.Atlas.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, fontAlternative.Atlas.Texture.Pixels);
+
+        foreach (Font font in fonts)
+        {
+            if (font.GrayscaleAtlas != null)
+            {
+                AtlasTexture atlasTexture = font.GrayscaleAtlas;
+                GL.CreateTextures(TextureTarget.Texture2D, 1, out int texture);
+                GL.TextureStorage2D(texture, 1, SizedInternalFormat.R8, atlasTexture.Texture.Width, atlasTexture.Texture.Height);
+                GL.TextureSubImage2D(texture, 0, 0, 0, atlasTexture.Texture.Width, atlasTexture.Texture.Height, PixelFormat.Red, PixelType.UnsignedByte, atlasTexture.Texture.Pixels);
+                textures.Add(texture);
+            }
+            
+            if (font.ColoredAtlas != null)
+            {
+                AtlasTexture atlasTexture = font.ColoredAtlas;
+                GL.CreateTextures(TextureTarget.Texture2D, 1, out int texture);
+                GL.TextureStorage2D(texture, 1, SizedInternalFormat.Rgba8, atlasTexture.Texture.Width, atlasTexture.Texture.Height);
+                GL.TextureSubImage2D(texture, 0, 0, 0, atlasTexture.Texture.Width, atlasTexture.Texture.Height, PixelFormat.Bgra, PixelType.UnsignedByte, atlasTexture.Texture.Pixels);
+                textures.Add(texture);
+            }
+        }
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
         base.OnRenderFrame(args);
+        
+        GL.ClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         
         GL.Viewport(0, 0, Size.X, Size.Y);
         GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -168,14 +183,13 @@ public class MainWindow : GameWindow
         
         GL.UseProgram(program);
         GL.UniformMatrix4(0, true, ref projection);
-        GL.Uniform1(1, 0);
-        GL.Uniform1(2, 1);
-        GL.Uniform1(3, 2);
-        GL.Uniform1(4, 3);
-        GL.BindTextureUnit(0, textures[0]);
-        GL.BindTextureUnit(1, textures[1]);
-        GL.BindTextureUnit(2, textures[2]);
-        GL.BindTextureUnit(3, textures[3]);
+
+        for (int i = 0; i < textures.Count; i++)
+        {
+            GL.Uniform1(1 + i, i);
+            GL.BindTextureUnit(i, textures[i]);
+        }
+        
         GL.BindVertexArray(vao);
         GL.DrawArrays(PrimitiveType.Triangles, 0, vertCount);
         

@@ -12,5 +12,6 @@ public struct Glyph
     public int HorizontalBearingY { get; set; }
     public int VerticalBearingX { get; set; }
     public int VerticalBearingY { get; set; }
+    public bool Colored { get; set; }
     public UvInfo Uv { get; set; }
 }

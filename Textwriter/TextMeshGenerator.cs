@@ -21,12 +21,12 @@ public static class TextMeshGenerator
             int baselineOffsetX = advanceX + text.OffsetX;
             int baselineOffsetY = advanceY + text.OffsetY;
 
-            GlyphInfo[] glyphInfos = text.Glyphs;
+            BuiltGlyph[] glyphInfos = text.Glyphs;
 
             Style style = text.Style;
             Color color = style.Color;
             
-            foreach (GlyphInfo glyphInfo in glyphInfos)
+            foreach (BuiltGlyph glyphInfo in glyphInfos)
             {
                 Glyph glyph = text.Font.GetGlyph(glyphInfo.Index);
 
@@ -43,22 +43,22 @@ public static class TextMeshGenerator
 
                     vertices.Add(new TextVertex(minX, minY, minU, maxV, 
                         color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                        text.TextureIndex));
+                        glyphInfo.TextureIndex));
                     vertices.Add(new TextVertex(maxX, maxY, maxU, minV, 
                         color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                        text.TextureIndex));
+                        glyphInfo.TextureIndex));
                     vertices.Add(new TextVertex(minX, maxY, minU, minV, 
                         color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                        text.TextureIndex));
+                        glyphInfo.TextureIndex));
                     vertices.Add(new TextVertex(minX, minY, minU, maxV, 
                         color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                        text.TextureIndex));
+                        glyphInfo.TextureIndex));
                     vertices.Add(new TextVertex(maxX, minY, maxU, maxV, 
                         color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                        text.TextureIndex));
+                        glyphInfo.TextureIndex));
                     vertices.Add(new TextVertex(maxX, maxY, maxU, minV, 
                         color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f,
-                        text.TextureIndex));
+                        glyphInfo.TextureIndex));
                 }
 
                 advanceX += glyphInfo.AdvanceX;
