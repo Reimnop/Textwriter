@@ -72,13 +72,13 @@ public static class TextMeshGenerator
                 float beginY = (baselineOffsetY + text.Font.UnderlinePosition + text.Font.UnderlineThickness / 2) / 64.0f;
                 float endX = (advanceX + text.OffsetX) / 64.0f;
                 float endY = (baselineOffsetY + text.Font.UnderlinePosition - text.Font.UnderlineThickness / 2) / 64.0f;
-
-                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
-                vertices.Add(new TextVertex(endX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                
                 vertices.Add(new TextVertex(beginX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
-                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
-                vertices.Add(new TextVertex(endX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
                 vertices.Add(new TextVertex(endX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(endX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(endX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
             }
             
             // Strikethrough
@@ -88,13 +88,13 @@ public static class TextMeshGenerator
                 float beginY = (baselineOffsetY + text.Font.StrikethroughPosition + text.Font.StrikethroughThickness / 2) / 64.0f;
                 float endX = (advanceX + text.OffsetX) / 64.0f;
                 float endY = (baselineOffsetY + text.Font.StrikethroughPosition - text.Font.StrikethroughThickness / 2) / 64.0f;
-
-                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
-                vertices.Add(new TextVertex(endX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                
                 vertices.Add(new TextVertex(beginX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
-                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
-                vertices.Add(new TextVertex(endX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
                 vertices.Add(new TextVertex(endX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(endX, endY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(endX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
+                vertices.Add(new TextVertex(beginX, beginY, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f));
             }
         }
 

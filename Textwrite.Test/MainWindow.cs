@@ -165,6 +165,10 @@ public class MainWindow : GameWindow
                 textures.Add(texture);
             }
         }
+        
+        GL.Enable(EnableCap.CullFace);
+        GL.CullFace(CullFaceMode.Back);
+        GL.FrontFace(FrontFaceDirection.Ccw);
     }
 
     protected override void OnRenderFrame(FrameEventArgs args)
