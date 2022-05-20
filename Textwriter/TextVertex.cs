@@ -7,8 +7,8 @@ namespace Textwriter;
 public struct TextVertex
 {
     public Vector2 Position;
-    public Vector2 Uv;
     public Vector4 Color;
+    public Vector2 Uv;
     public int TextureIndex;
 
     public TextVertex(float x, float y, float u, float v, float r, float g, float b, float a, int index)

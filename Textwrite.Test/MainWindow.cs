@@ -132,14 +132,14 @@ public class MainWindow : GameWindow
         
         GL.EnableVertexArrayAttrib(vao, 1);
         GL.VertexArrayVertexBuffer(vao, 1, vbo, new IntPtr(sizeof(float) * 2), stride);
-        GL.VertexArrayAttribFormat(vao, 1, 2, VertexAttribType.Float, false, 0);
+        GL.VertexArrayAttribFormat(vao, 1, 4, VertexAttribType.Float, false, 0);
         GL.VertexArrayAttribBinding(vao, 1, 1);
         
         GL.EnableVertexArrayAttrib(vao, 2);
-        GL.VertexArrayVertexBuffer(vao, 2, vbo, new IntPtr(sizeof(float) * 4), stride);
-        GL.VertexArrayAttribFormat(vao, 2, 4, VertexAttribType.Float, false, 0);
+        GL.VertexArrayVertexBuffer(vao, 2, vbo, new IntPtr(sizeof(float) * 6), stride);
+        GL.VertexArrayAttribFormat(vao, 2, 2, VertexAttribType.Float, false, 0);
         GL.VertexArrayAttribBinding(vao, 2, 2);
-        
+
         GL.EnableVertexArrayAttrib(vao, 3);
         GL.VertexArrayVertexBuffer(vao, 3, vbo, new IntPtr(sizeof(float) * 8), stride);
         GL.VertexArrayAttribIFormat(vao, 3, 1, VertexAttribType.Int, 0);
